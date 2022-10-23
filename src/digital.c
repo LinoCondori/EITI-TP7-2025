@@ -55,8 +55,8 @@
 /* === Declaraciones de tipos de datos privados ============================ */
 struct digital_output_s
 {
-    uint8_t port;
-    uint8_t pin;
+    uint8_t gpio;
+    uint8_t bit;
 
 };
 
@@ -70,17 +70,20 @@ static struct digital_output_s instance;
 /* === Definiciones de funciones privadas ================================== */
 
 /* === Definiciones de funciones publicas ================================== */
-digital_output_t DigitalOutputCreate(uint8_t port, uint8_t pin){
-    instance.port = port;
-    instance.pin = pin;
+digital_output_t DigitalOutputCreate(uint8_t gpio, uint8_t bit){
+    instance.gpio = gpio;
+    instance.bit = bit;
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio, bit, false);
+    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio, bit, true);
+
     return &instance;
 }
 void DigitalOutputActivate(digital_output_t output){
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->port, output->pin, true);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->gpio, output->bit, true);
 
 }
 void DigitalOutputDesactivate(digital_output_t output){
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->port, output->pin, false);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->gpio, output->bit, false);
 
 }
 void DigitalOutputToggle(digital_output_t output){
