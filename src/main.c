@@ -72,28 +72,21 @@ int main(void) {
 
 
     while (true) {
-        //Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TEC_1_GPIO, TEC_1_BIT) == 0
         if (DigitalInputHasActivated(board->btn_prueba)) {
             DigitalOutputActivate(board->led_azul);
-            // Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_B_GPIO, LED_B_BIT, true);
         } else {
             DigitalOutputDesactivate(board->led_azul);
-            //Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_B_GPIO, LED_B_BIT, false);
         }
 
-        //current_state = (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TEC_2_GPIO, TEC_2_BIT) == 0);
-        current_state = (DigitalInputHasActivated(board->btn_cambiar));
-        if ((current_state) && (!last_state)) {
+        if (DigitalInputHasChanged(board->btn_cambiar)) {
             DigitalOutputToggle(board->led_uno);
-            //Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, LED_1_GPIO, LED_1_BIT);
         }
-        last_state = current_state;
 
-        //if (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TEC_3_GPIO, TEC_3_BIT) == 0) {
-        if (DigitalInputHasActivated(board->btn_prender)) {
+
+        if (DigitalInputGetState(board->btn_prender)) {
             DigitalOutputActivate(board->led_dos);
         }
-        if (DigitalInputHasActivated(board->btn_apagar)) {
+        if (DigitalInputGetState(board->btn_apagar)) {
             DigitalOutputDesactivate(board->led_dos);
         }
 
@@ -101,7 +94,6 @@ int main(void) {
         if (divisor == 5) {
             divisor = 0;
             DigitalOutputToggle(board->led_tres);
-            //Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, LED_3_GPIO, LED_3_BIT);
         }
 
         for (int index = 0; index < 100; index++) {

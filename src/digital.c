@@ -129,11 +129,12 @@ void DigitalOutputToggle(digital_output_t output){
     Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, output->gpio, output->bit);
 }
 
-digital_input_t DigitalInputCreate(uint8_t gpio, uint8_t bit){
+digital_input_t DigitalInputCreate(uint8_t gpio, uint8_t bit, bool inverted){
     digital_input_t input = DigitalInputAllocate();
     if (input){
         input->gpio = gpio;
         input->bit = bit;
+        input->inverted = inverted;
         Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio, bit, false);
     }
     return input;
@@ -144,9 +145,25 @@ bool DigitalInputGetState(digital_input_t input){
 }
 
 bool DigitalInputHasActivated(digital_input_t input){
-    return (DigitalInputGetState(input) == 0);
+    bool state = DigitalInputGetState(input);
+    bool result = state && !input->last_state;
+    input->last_state = state;
+    return result;
 }
 
+bool DigitalInputHasDesactivated(digital_input_t input){
+    bool state = DigitalInputGetState(input);
+    bool result = !state && !input->last_state;
+    input->last_state = state;
+    return result;
+}
+
+bool DigitalInputHasChanged(digital_input_t input){
+    bool state = DigitalInputGetState(input);
+    bool result = state != input->last_state;
+    input->last_state = state;
+    return result;
+}
 /* === Ciere de documentacion ============================================== */
 
 /** @} Final de la definición del modulo para doxygen */
