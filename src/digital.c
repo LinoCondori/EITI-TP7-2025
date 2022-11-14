@@ -51,10 +51,13 @@
 #include "chip.h"
 
 /* === Definicion y Macros privados ======================================== */
-#ifndef OUTPUT_INSTANCES
-    #define OUTPUT_INSTANCES    4
+#ifndef INPUT_INSTANCES
+    #define INPUT_INSTANCES    4
 #endif
 
+#ifndef OUTPUT_INSTANCES
+    #define OUTPUT_INSTANCES    8
+#endif
 /* === Declaraciones de tipos de datos privados ============================ */
 struct digital_output_s
 {
@@ -74,7 +77,7 @@ struct digital_input_s
 
 /* === Definiciones de variables privadas ================================== */
 static struct digital_output_s instances[OUTPUT_INSTANCES] = {0};
-static struct digital_input_s Instances[OUTPUT_INSTANCES] = {0};
+static struct digital_input_s Instances[INPUT_INSTANCES] = {0};
 
 
 /* === Definiciones de variables publicas ================================== */

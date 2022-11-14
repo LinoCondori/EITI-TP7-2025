@@ -74,7 +74,7 @@ void DigitalOutputToggle(digital_output_t output);
 
 digital_input_t DigitalInputCreate(uint8_t gpio, uint8_t bit, bool interted);
 bool DigitalInputGetState(digital_input_t input);
-bool DigitalInputHasChanged(digital_input_s input);
+bool DigitalInputHasChanged(digital_input_t input);
 bool DigitalInputHasActivated(digital_input_t input);
 bool DigitalInputHasDesactivated(digital_input_t input);
 

@@ -1,5 +1,4 @@
 /* Copyright 2022, Lino Fabian Condorì <condori.lino.f@gmail.com>
- * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,15 +59,14 @@ extern "C" {
 
 /* == Declaraciones de tipos de datos publicos ============================= */
 typedef struct board_s{    
-    digital_output_t led_azul;
-    digital_output_t led_uno;
-    digital_output_t led_dos;
-    digital_output_t led_tres;
+    digital_output_t buzzer;
 
-    digital_input_t btn_prueba;
-    digital_input_t btn_cambiar;
-    digital_input_t btn_prender;
-    digital_input_t btn_apagar;
+    digital_input_t set_time;
+    digital_input_t set_alarm;
+    digital_input_t decrement;
+    digital_input_t increment;
+    digital_input_t accept;
+    digital_input_t cancel;
 
     /* data */
 }const * board_t;
