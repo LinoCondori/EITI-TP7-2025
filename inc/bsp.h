@@ -50,6 +50,8 @@
 
 /* === Inclusiones de archivos externos ==================================== */
 #include "digital.h"
+#include "pantalla.h"
+
 /* === Cabecera C++ ======================================================== */
 #ifdef __cplusplus
 extern "C" {
@@ -68,7 +70,8 @@ typedef struct board_s{
     digital_input_t accept;
     digital_input_t cancel;
 
-    /* data */
+    display_t display;
+    
 }const * board_t;
 
 

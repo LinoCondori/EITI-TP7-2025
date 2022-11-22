@@ -66,6 +66,11 @@ static void SegmentsInit(void);
 static void BuzzerInit(void);
 static void KeysInit(void);
 
+void DisplayInit(void);
+void ScreenOff(void);
+void WriteNumber(uint8_t segments);
+void SelectDigit(uint8_t digit);
+
 /* === Definiciones de funciones privadas ================================== */
 void DigitsInit(void){
     Chip_SCU_PinMuxSet(DIGIT_1_PORT, DIGIT_1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | DIGIT_1_FUNC);
@@ -141,11 +146,37 @@ void KeysInit(void){
     board.increment = DigitalInputCreate(KEY_F4_GPIO, KEY_F4_BIT, true);
 }
 
+void DisplayInit(void){
+    static const struct display_driver_s display_driver = {
+        .ScreenTurnOff = ScreenOff,
+        .SegmentsTurnOn = WriteNumber,
+        .DigitTurnOn = SelectDigit,
+    };
+    board.display = DisplayCreate(4, &display_driver);
+
+}
+
+
+void ScreenOff(void){
+    Chip_GPIO_ClearValue(LPC_GPIO_PORT, DIGITS_GPIO, DIGITS_MASK);
+    Chip_GPIO_ClearValue(LPC_GPIO_PORT, SEGMENTS_GPIO, SEGMENTS_MASK);
+
+}
+
+void WriteNumber(uint8_t segments){
+    Chip_GPIO_SetValue(LPC_GPIO_PORT, SEGMENTS_GPIO, segments);
+}
+void SelectDigit(uint8_t digit){
+    Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO,(1 << digit));
+
+}
+
 board_t BoardCreate(void){
     DigitsInit();
     SegmentsInit();
     BuzzerInit();
     KeysInit();
+    DisplayInit();
     return &board;
 }
 /* === Definiciones de funciones publicas ================================== */
