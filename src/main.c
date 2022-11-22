@@ -43,44 +43,30 @@
 
 #include <stdbool.h>
 #include "bsp.h"
-#include "chip.h"
-#include "ciaa.h"
+#include "pantalla.h"
 #include "poncho.h"
-
 /* === Macros definitions ====================================================================== */
-#define SEGMENT_A (1<<0)
-#define SEGMENT_B (1<<1)
-#define SEGMENT_C (1<<2)
-#define SEGMENT_D (1<<3)
-#define SEGMENT_E (1<<4)
-#define SEGMENT_F (1<<5)
-#define SEGMENT_G (1<<6)
-#define SEGMENT_P (1<<7)
+
 
 /* === Private data type declarations ========================================================== */
 
 /* === Private variable declarations =========================================================== */
 
 /* === Private function declarations =========================================================== */
-static const uint8_t IMAGES[] = {
-    SEGMENT_A + SEGMENT_B + SEGMENT_C + SEGMENT_D + SEGMENT_E + SEGMENT_F,
-    SEGMENT_B + SEGMENT_C,
-    SEGMENT_A + SEGMENT_B + SEGMENT_D + SEGMENT_E + SEGMENT_G,
-    SEGMENT_A + SEGMENT_B + SEGMENT_C + SEGMENT_D + SEGMENT_G,
-    SEGMENT_B + SEGMENT_C + SEGMENT_F + SEGMENT_G,
-    SEGMENT_A + SEGMENT_C + SEGMENT_D + SEGMENT_F + SEGMENT_G,
-    SEGMENT_A + SEGMENT_C + SEGMENT_D + SEGMENT_E + SEGMENT_F + SEGMENT_G,
-    SEGMENT_A + SEGMENT_B + SEGMENT_C,
-    SEGMENT_A + SEGMENT_B + SEGMENT_C + SEGMENT_D + SEGMENT_E + SEGMENT_F + SEGMENT_G,
-    SEGMENT_A + SEGMENT_B + SEGMENT_C + SEGMENT_F + SEGMENT_G,
-};
+
 /* === Public variable definitions ============================================================= */
 
 /* === Private variable definitions ============================================================ */
 
 /* === Private function implementation ========================================================= */
-void WriteNumber(uint8_t number){
-    Chip_GPIO_SetValue(LPC_GPIO_PORT, SEGMENTS_GPIO,IMAGES[number]);
+void ScreenOff(void){
+    Chip_GPIO_ClearValue(LPC_GPIO_PORT, DIGITS_GPIO, DIGITS_MASK);
+    Chip_GPIO_ClearValue(LPC_GPIO_PORT, SEGMENTS_GPIO, SEGMENTS_MASK);
+
+}
+
+void WriteNumber(uint8_t segments){
+    Chip_GPIO_SetValue(LPC_GPIO_PORT, SEGMENTS_GPIO, segments);
 }
 void SelectDigit(uint8_t digit){
     Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO,(1 << digit));
@@ -89,19 +75,33 @@ void SelectDigit(uint8_t digit){
 /* === Public function implementation ========================================================= */
 
 int main(void) {
+    static const struct display_driver_s display_driver =
+    {
+        .ScreenTurnOff = ScreenOff,
+        .SegmentsTurnOn = WriteNumber,
+        .DigitTurnOn = SelectDigit,
+    };
     
-    board_t board = BoardCreate();
-    
-    WriteNumber(5);
+    uint8_t numero[4] = {1, 2, 3, 4};
 
+
+
+    board_t board = BoardCreate();
+
+    display_t display = DisplayCreate(4, &display_driver);
+
+    DisplayWriteBCD(display, numero, sizeof(numero));
 
     while (true) {
-        for (int index = 0; index < 100; index++) {
-            for (int delay = 0; delay < 25000; delay++) {
-                __asm("NOP");
-            }
+        DisplayRefresh(display);
+
+        for (int delay = 0; delay < 25000; delay++) {
+            __asm("NOP");
         }
-    }
+        
+
+   
+}
 }
 
 /* === End of documentation ==================================================================== */

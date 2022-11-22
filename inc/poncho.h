@@ -58,7 +58,7 @@ extern "C" {
 /* === Definicion y Macros publicos ======================================== */
  
 // Definiciones de los recursos asociados a los DIGITs de la pantalla
-#define DIGITS_GPIO   0
+#define DIGITS_GPIO  0
 
 #define DIGIT_1_PORT 0
 #define DIGIT_1_PIN  0
