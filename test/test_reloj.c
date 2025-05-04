@@ -1,9 +1,11 @@
 #include "unity.h"
 #include "clock.h"
+
+#define TICKS_PER_SECOND 5
 /*
 1) Configurar la libreria, consultar la hora y tiene que ser invalida
 2) Configurar la libreria, ajustar la hora(con valores correctos), consultar la hora y tiene que ser valida.
-2) Configurar la libreria, ajustar la hora(con valores incorrectos), tiene que devolver que es un error.
+3) Configurar la libreria, ajustar la hora(con valores incorrectos), tiene que devolver que es un error.
 4) Simujlar el paso de n ciclos de reloj, consultar la hora y verificar que avanzo un segundo.
 5) Simujlar el paso de 10*n ciclos de reloj, consultar la hora y verificar que avanzo diez segundos.
 .... y con 60*n, etc
@@ -17,11 +19,25 @@
 12) Si la alarma se activo y la cancelo vuelve a sonar 24 horas despues.
 */
 
+//1) Configurar la libreria, consultar la hora y tiene que ser invalida
 void test_start_up(void){
     static const uint8_t ESPERADO[] = {0, 0, 0, 0, 0, 0};
     uint8_t hora[6];
-    clock_t reloj = ClockCreate(5);
-    TEST_ASSERT_FALSE(ClockGetTime(reloj, hora, 6));
-    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6);
+    clock_t reloj = ClockCreate(TICKS_PER_SECOND);
+    TEST_ASSERT_FALSE(ClockGetTime(reloj, hora, sizeof(hora)));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
 
+}
+
+
+// 2) Configurar la libreria, ajustar la hora(con valores correctos), consultar la hora y tiene que ser valida.
+
+void test_set_up_current_time(void){
+    static const uint8_t INICIAL[] = {1, 2, 3, 4};
+    static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 0};
+    uint8_t hora[6];
+    clock_t reloj = ClockCreate(TICKS_PER_SECOND);
+    ClockSetupTime(reloj, INICIAL, sizeof(INICIAL));
+    TEST_ASSERT_TRUE(ClockGetTime(reloj, hora, sizeof(hora)));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
 }
