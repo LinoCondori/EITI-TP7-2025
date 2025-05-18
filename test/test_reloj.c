@@ -19,6 +19,13 @@
 12) Si la alarma se activo y la cancelo vuelve a sonar 24 horas despues.
 */
 
+clock_t reloj;
+
+void setUp(void){
+    static const uint8_t INICIAL[] = {1, 2, 3, 4};
+    reloj = ClockCreate(TICKS_PER_SECOND);
+    ClockSetupTime(reloj, INICIAL, sizeof(INICIAL));
+}
 //1) Configurar la libreria, consultar la hora y tiene que ser invalida
 void test_start_up(void){
     static const uint8_t ESPERADO[] = {0, 0, 0, 0, 0, 0};
@@ -33,11 +40,22 @@ void test_start_up(void){
 // 2) Configurar la libreria, ajustar la hora(con valores correctos), consultar la hora y tiene que ser valida.
 
 void test_set_up_current_time(void){
-    static const uint8_t INICIAL[] = {1, 2, 3, 4};
     static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 0};
     uint8_t hora[6];
-    clock_t reloj = ClockCreate(TICKS_PER_SECOND);
-    ClockSetupTime(reloj, INICIAL, sizeof(INICIAL));
     TEST_ASSERT_TRUE(ClockGetTime(reloj, hora, sizeof(hora)));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
+}
+
+//4) Simujlar el paso de n ciclos de reloj, consultar la hora y verificar que avanzo un segundo.
+
+void test_one_second_elapsed(void){
+
+    static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 1};
+    uint8_t hora[6];
+
+    for(int index = 0; index < TICKS_PER_SECOND; index++){
+        ClockNewTick(reloj);
+    }
+    ClockGetTime(reloj, hora, sizeof(hora));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
 }
