@@ -21,6 +21,12 @@
 
 clock_t reloj;
 
+void SimulateSeconds(int seconds){
+    for(int index = 0; index < seconds * TICKS_PER_SECOND; index++){
+        ClockNewTick(reloj);
+    }
+}
+
 void setUp(void){
     static const uint8_t INICIAL[] = {1, 2, 3, 4};
     reloj = ClockCreate(TICKS_PER_SECOND);
@@ -53,9 +59,67 @@ void test_one_second_elapsed(void){
     static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 1};
     uint8_t hora[6];
 
-    for(int index = 0; index < TICKS_PER_SECOND; index++){
-        ClockNewTick(reloj);
-    }
+    SimulateSeconds(1);
+    ClockGetTime(reloj, hora, sizeof(hora));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
+}
+
+void test_ten_second_elapsed(void){
+
+    static const uint8_t ESPERADO[] = {1, 2, 3, 4, 1, 0};
+    uint8_t hora[6];
+
+    SimulateSeconds(10);
+    ClockGetTime(reloj, hora, sizeof(hora));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
+}
+
+void test_one_minute_elapsed(void){
+
+    static const uint8_t ESPERADO[] = {1, 2, 3, 5, 0, 0};
+    uint8_t hora[6];
+
+    SimulateSeconds(60);
+    ClockGetTime(reloj, hora, sizeof(hora));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
+}
+
+void test_ten_minute_elapsed(void){
+
+    static const uint8_t ESPERADO[] = {1, 2, 4, 4, 0, 0};
+    uint8_t hora[6];
+
+    SimulateSeconds(10*60);
+    ClockGetTime(reloj, hora, sizeof(hora));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
+}
+
+void test_one_hour_elapsed(void){
+
+    static const uint8_t ESPERADO[] = {1, 3, 3, 4, 0, 0};
+    uint8_t hora[6];
+
+    SimulateSeconds(60*60);
+    ClockGetTime(reloj, hora, sizeof(hora));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
+}
+
+void test_ten_hour_elapsed(void){
+
+    static const uint8_t ESPERADO[] = {2, 2, 3, 4, 0, 0};
+    uint8_t hora[6];
+
+    SimulateSeconds(10*60*60);
+    ClockGetTime(reloj, hora, sizeof(hora));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
+}
+
+void test_one_day_elapsed(void){
+
+    static const uint8_t ESPERADO[] = {1, 2, 3, 4, 0, 0};
+    uint8_t hora[6];
+
+    SimulateSeconds(24*60*60);
     ClockGetTime(reloj, hora, sizeof(hora));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
 }

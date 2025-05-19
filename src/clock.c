@@ -4,7 +4,13 @@
 #define TIME_SIZE 6
 #define START_VALUE 0
 
-#define SECONDS_UNIT 5
+#define SECONDS_UNITS 5
+#define SECONDS_TENS 4
+#define MINUTES_UNITS 3
+#define MINUTES_TENS 2
+#define HOURS_UNITS 1
+#define HOURS_TENS 0
+
 
 struct clock_s{
     bool valid;
@@ -37,6 +43,31 @@ void ClockNewTick(clock_t clock){
     clock->ticks_count++;
     if (clock->ticks_count == clock->ticks_per_second){
         clock->ticks_count = START_VALUE;
-        clock->time[SECONDS_UNIT]++;
+        clock->time[SECONDS_UNITS]++;
     }
+    if (clock->time[SECONDS_UNITS] == 10){
+        clock->time[SECONDS_UNITS] = START_VALUE;
+        clock->time[SECONDS_TENS]++;
+    }
+    if (clock->time[SECONDS_TENS] == 6){
+        clock->time[SECONDS_TENS] = START_VALUE;
+        clock->time[MINUTES_UNITS]++;
+    }
+    if (clock->time[MINUTES_UNITS] == 10){
+        clock->time[MINUTES_UNITS] = START_VALUE;
+        clock->time[MINUTES_TENS]++;
+    }
+    if (clock->time[MINUTES_TENS] == 6){
+        clock->time[MINUTES_TENS] = START_VALUE;
+        clock->time[HOURS_UNITS]++;
+    }
+    if (clock->time[HOURS_UNITS] == 10){
+        clock->time[HOURS_UNITS] = START_VALUE;
+        clock->time[HOURS_TENS]++;
+    }
+    if (clock->time[HOURS_TENS] == 2 & clock->time[HOURS_UNITS] == 4 ){
+        clock->time[HOURS_UNITS] = START_VALUE;
+        clock->time[HOURS_TENS]= START_VALUE;
+    }
+    
 }
