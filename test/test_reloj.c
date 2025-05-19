@@ -9,10 +9,10 @@
 4) Simujlar el paso de n ciclos de reloj, consultar la hora y verificar que avanzo un segundo.
 5) Simujlar el paso de 10*n ciclos de reloj, consultar la hora y verificar que avanzo diez segundos.
 .... y con 60*n, etc
-6) Configurar la hora de la alarma (con valores correctos) y revisar si la guarda.
+
 7) Configurar la hora de la alarma (con valores incorrectos) y revisar si la rechaza.
 8) Configurar la hora de la alarma (con valores correctos) y revisar si queda activa.
-9) Si la alarma esta activa y la desactivo , queda desactivada, pero no cambia la hora.
+
 10) Si la alamra esta desctivada y la activo, queda activa, pero no cambia la hora.
 11) Si la alarma activa, y la hora del reloj councide con la hora de la alarma, entoces suena.
 12) Si la alarma se activo y la pospongo n minutos, vuelve a sonar n minutos.
@@ -39,6 +39,8 @@ void test_start_up(void){
     clock_t reloj = ClockCreate(TICKS_PER_SECOND);
     TEST_ASSERT_FALSE(ClockGetTime(reloj, hora, sizeof(hora)));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
+
+    TEST_ASSERT_FALSE(ClockGetAlarm(reloj, hora, sizeof(hora)));
 
 }
 
@@ -123,3 +125,24 @@ void test_one_day_elapsed(void){
     ClockGetTime(reloj, hora, sizeof(hora));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
 }
+
+//6) Configurar la hora de la alarma (con valores correctos) y revisar si la guarda.
+void test_setup_and_get_alarm(void){
+    static const uint8_t ALARMA[] = {1, 2, 3, 5};
+    uint8_t hora[4];
+
+    ClockSetupAlarm(reloj, ALARMA, sizeof(ALARMA));
+    TEST_ASSERT_TRUE(ClockGetAlarm(reloj, hora, sizeof(hora)));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ALARMA, hora, sizeof(ALARMA));
+}
+//9) Si la alarma esta activa y la desactivo , queda desactivada, pero no cambia la hora.
+void test_setup_and_disable_alarm(void){
+    static const uint8_t ALARMA[] = {1, 2, 3, 5};
+    uint8_t hora[4];
+
+    ClockSetupAlarm(reloj, ALARMA, sizeof(ALARMA));
+    TEST_ASSERT_FALSE(ClockToggleAlarm(reloj));
+    TEST_ASSERT_FALSE(ClockGetAlarm(reloj, hora, sizeof(hora)));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ALARMA, hora, sizeof(ALARMA));
+}
+

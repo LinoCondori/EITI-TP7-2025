@@ -2,6 +2,8 @@
 #include <string.h>
 
 #define TIME_SIZE 6
+#define ALARM_SIZE 4
+
 #define START_VALUE 0
 
 #define SECONDS_UNITS 5
@@ -14,15 +16,18 @@
 
 struct clock_s{
     bool valid;
+    bool enabled;
     uint16_t ticks_per_second;
     uint16_t ticks_count;
     uint8_t time[TIME_SIZE];
+    uint8_t alarm[ALARM_SIZE];
     
 };
 static struct clock_s instances;
 
 clock_t ClockCreate(uint16_t ticks_per_second){
     instances.valid = false;
+    instances.enabled = false;
     instances.ticks_per_second = ticks_per_second;
     instances.ticks_count = START_VALUE;
     memset(instances.time, START_VALUE, TIME_SIZE);
@@ -70,4 +75,20 @@ void ClockNewTick(clock_t clock){
         clock->time[HOURS_TENS]= START_VALUE;
     }
     
+}
+
+void ClockSetupAlarm(clock_t clock, uint8_t const * const alarm, uint8_t size){
+    memcpy(clock->alarm, alarm, size);
+    clock->enabled = true;
+}
+
+bool ClockGetAlarm(clock_t clock, uint8_t * alarm, uint8_t size){
+    memcpy(alarm, clock->alarm, size);
+
+    return clock->enabled;
+}
+
+bool ClockToggleAlarm(clock_t clock){
+    clock->enabled = !clock->enabled;
+    return clock->enabled;
 }
