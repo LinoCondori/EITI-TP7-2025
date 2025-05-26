@@ -14,12 +14,13 @@
 8) Configurar la hora de la alarma (con valores correctos) y revisar si queda activa.
 
 10) Si la alamra esta desctivada y la activo, queda activa, pero no cambia la hora.
-11) Si la alarma activa, y la hora del reloj councide con la hora de la alarma, entoces suena.
+
 12) Si la alarma se activo y la pospongo n minutos, vuelve a sonar n minutos.
-12) Si la alarma se activo y la cancelo vuelve a sonar 24 horas despues.
+
 */
 
 clock_t reloj;
+bool alarm_state;
 
 void SimulateSeconds(int seconds){
     for(int index = 0; index < seconds * TICKS_PER_SECOND; index++){
@@ -27,16 +28,21 @@ void SimulateSeconds(int seconds){
     }
 }
 
+void AlarmEventHandler(clock_t clock, bool state){
+    alarm_state = state;
+}
+
 void setUp(void){
     static const uint8_t INICIAL[] = {1, 2, 3, 4};
-    reloj = ClockCreate(TICKS_PER_SECOND);
+    reloj = ClockCreate(TICKS_PER_SECOND, AlarmEventHandler);
     ClockSetupTime(reloj, INICIAL, sizeof(INICIAL));
+    alarm_state = false;
 }
 //1) Configurar la libreria, consultar la hora y tiene que ser invalida
 void test_start_up(void){
     static const uint8_t ESPERADO[] = {0, 0, 0, 0, 0, 0};
     uint8_t hora[6];
-    clock_t reloj = ClockCreate(TICKS_PER_SECOND);
+    clock_t reloj = ClockCreate(TICKS_PER_SECOND, AlarmEventHandler);
     TEST_ASSERT_FALSE(ClockGetTime(reloj, hora, sizeof(hora)));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, sizeof(ESPERADO));
 
@@ -145,4 +151,30 @@ void test_setup_and_disable_alarm(void){
     TEST_ASSERT_FALSE(ClockGetAlarm(reloj, hora, sizeof(hora)));
     TEST_ASSERT_EQUAL_UINT8_ARRAY(ALARMA, hora, sizeof(ALARMA));
 }
+
+//11) Si la alarma activa, y la hora del reloj councide con la hora de la alarma, entoces suena.
+//13) Si la alarma se activo y la cancelo vuelve a sonar 24 horas despues.
+void test_setup_and_fire_alarm(void){
+    static const uint8_t ALARMA[] = {1, 2, 3, 5};
+    
+    ClockSetupAlarm(reloj, ALARMA, sizeof(ALARMA));
+    SimulateSeconds(60);
+    TEST_ASSERT_TRUE(alarm_state);
+    alarm_state = false;
+    SimulateSeconds(24*60*60-1);
+    TEST_ASSERT_FALSE(alarm_state);
+    SimulateSeconds(1);
+    TEST_ASSERT_TRUE(alarm_state);
+}
+
+void test_setup_and_not_fire_alarm(void){
+    static const uint8_t ALARMA[] = {1, 2, 3, 5};
+    
+    ClockSetupAlarm(reloj, ALARMA, sizeof(ALARMA));
+    ClockToggleAlarm(reloj);
+    SimulateSeconds(60);
+    TEST_ASSERT_FALSE(alarm_state);
+
+}
+
 

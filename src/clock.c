@@ -21,13 +21,15 @@ struct clock_s{
     uint16_t ticks_count;
     uint8_t time[TIME_SIZE];
     uint8_t alarm[ALARM_SIZE];
+    clock_event_t event_handler;
     
 };
 static struct clock_s instances;
 
-clock_t ClockCreate(uint16_t ticks_per_second){
+clock_t ClockCreate(uint16_t ticks_per_second, clock_event_t event_handler){
     instances.valid = false;
     instances.enabled = false;
+    instances.event_handler = event_handler;
     instances.ticks_per_second = ticks_per_second;
     instances.ticks_count = START_VALUE;
     memset(instances.time, START_VALUE, TIME_SIZE);
@@ -49,7 +51,7 @@ void ClockNewTick(clock_t clock){
     if (clock->ticks_count == clock->ticks_per_second){
         clock->ticks_count = START_VALUE;
         clock->time[SECONDS_UNITS]++;
-    }
+    
     if (clock->time[SECONDS_UNITS] == 10){
         clock->time[SECONDS_UNITS] = START_VALUE;
         clock->time[SECONDS_TENS]++;
@@ -73,6 +75,17 @@ void ClockNewTick(clock_t clock){
     if (clock->time[HOURS_TENS] == 2 & clock->time[HOURS_UNITS] == 4 ){
         clock->time[HOURS_UNITS] = START_VALUE;
         clock->time[HOURS_TENS]= START_VALUE;
+    }
+    bool activate = (clock->time[SECONDS_TENS] == 0) && (clock->time[SECONDS_UNITS] == 0);
+    for(int index = 0; index< ALARM_SIZE; index++){
+        if(clock->alarm[index] != clock->time[index]){
+            activate = false;
+            break;
+        }
+    }
+    if(activate && clock->enabled){
+        clock->event_handler(clock, true);
+    }
     }
     
 }
