@@ -1,4 +1,8 @@
-/* Copyright 2022, Lino Fabian Condorì <condori.lino.f@gmail.com>
+/* Copyright 2022, Laboratorio de Microprocesadores
+ * Facultad de Ciencias Exactas y Tecnología
+ * Universidad Nacional de Tucuman
+ * http://www.microprocesadores.unt.edu.ar/
+ * Copyright 2022, Esteban Volentini <evolentini@herrera.unt.edu.ar>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,68 +32,84 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** @file digital.c
+/** \brief Digital inputs/outputs definitions
  **
- ** @brief Plantilla de archivos fuente
- **
- ** Plantilla para los archivos de codigo fuente de prácticos de las 
- ** asignaturas Diseño Integrado de Sistemas Emebebidos y Sistemas Embebidos
- ** de Tiempo Real dictadas en de la Especialización en Integración de
- ** Sistemas Informaticos de la Univesidad Nacional de Tucumán
- ** 
- ** | RV | YYYY.MM.DD | Autor       | Descripción de los cambios              |
- ** |----|------------|-------------|-----------------------------------------|
- ** |  1 | 2022.09.10 | lcondori    | Version inicial del archivo             |
- ** 
- ** @defgroup plantilla Plantillas de Archivos
- ** @brief Capa de Hardware de abtraccion
- ** @{ 
- */
+ ** \addtogroup hal HAL
+ ** \brief Hardware abstraction layer
+ ** @{ */
 
-/* === Inclusiones de cabeceras ============================================ */
+/* === Headers files inclusions =============================================================== */
+
 #include "digital.h"
 #include "chip.h"
 
-/* === Definicion y Macros privados ======================================== */
+/* === Macros definitions ====================================================================== */
+
 #ifndef INPUT_INSTANCES
-    #define INPUT_INSTANCES    4
+    #define INPUT_INSTANCES        4
 #endif
+
 
 #ifndef OUTPUT_INSTANCES
-    #define OUTPUT_INSTANCES    8
+    #define OUTPUT_INSTANCES       4
 #endif
-/* === Declaraciones de tipos de datos privados ============================ */
-struct digital_output_s
-{
-    uint8_t gpio;
-    uint8_t bit;
-    bool allocated;
+
+/* === Private data type declarations ========================================================== */
+
+//! Estructura para almacenar el descriptor de una entrada digital
+struct digital_input_s {
+    uint8_t port;           //!< Puerto GPIO de la entrada digital
+    uint8_t pin;            //!< Terminal del puerto GPIO de la entrada digital
+    bool inverted;          //!< La entrada opera con lógica invertida
+    bool last_state;        //!< Bandera con el ultimo estado reportado de la entrada
+    bool allocated;         //!< Bandera para indicar que el descriptor esta en uso
 };
 
-struct digital_input_s
-{
-    uint8_t gpio;
-    uint8_t bit;
-    bool allocated;
-    bool inverted;
-    bool last_state;
+//! Estructura para almacenar el descriptor de una salida digital
+struct digital_output_s {
+    uint8_t port;           //!< Puerto GPIO de la salida digital
+    uint8_t pin;            //!< Terminal del puerto GPIO de la salida digital
+    bool allocated;         //!< Bandera para indicar que el descriptor esta en uso
 };
 
-/* === Definiciones de variables privadas ================================== */
-static struct digital_output_s instances[OUTPUT_INSTANCES] = {0};
-static struct digital_input_s Instances[INPUT_INSTANCES] = {0};
+/* === Private variable declarations =========================================================== */
 
+/* === Private function declarations =========================================================== */
 
-/* === Definiciones de variables publicas ================================== */
+// Function para asignar un descriptor para crear una nueva entrada digital
+digital_input_t DigitalInputAllocate(void);
 
-/* === Declaraciones de funciones privadas ================================= */
+// Function para asignar un descriptor para crear una nueva salida digital
+digital_output_t DigitalOutputAllocate(void);
 
-/* === Definiciones de funciones privadas ================================== */
+/* === Public variable definitions ============================================================= */
 
-digital_output_t DigitalOutputAllocate(void){
+/* === Private variable definitions ============================================================ */
+
+/* === Private function implementation ========================================================= */
+
+digital_input_t DigitalInputAllocate(void) {
+    digital_input_t input = NULL;
+
+    static struct digital_input_s instances[INPUT_INSTANCES] =  {0};
+
+    for(int index = 0; index < INPUT_INSTANCES; index++) {
+        if (!instances[index].allocated) {
+            instances[index].allocated = true;
+            input = &instances[index];
+            break;
+        }
+    }
+    return input;
+}
+
+digital_output_t DigitalOutputAllocate(void) {
     digital_output_t output = NULL;
-    for(int index=0; index <OUTPUT_INSTANCES; index++){
-        if(instances[index].allocated == false){
+
+    static struct digital_output_s instances[OUTPUT_INSTANCES] =  {0};
+
+    for(int index = 0; index < OUTPUT_INSTANCES; index++) {
+        if (!instances[index].allocated) {
             instances[index].allocated = true;
             output = &instances[index];
             break;
@@ -98,76 +118,71 @@ digital_output_t DigitalOutputAllocate(void){
     return output;
 }
 
-digital_input_t DigitalInputAllocate(void){
-    digital_input_t input = NULL;
-    for(int index=0; index <OUTPUT_INSTANCES; index++){
-        if(Instances[index].allocated == false){
-            Instances[index].allocated = true;
-            input = &Instances[index];
-            break;
-        }
-    }
-    return input;
-}
+/* === Public function implementation ========================================================= */
 
-/* === Definiciones de funciones publicas ================================== */
-digital_output_t DigitalOutputCreate(uint8_t gpio, uint8_t bit){
-    digital_output_t output = DigitalOutputAllocate();
-    if (output){
-        output->gpio = gpio;
-        output->bit = bit;
-        Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio, bit, false);
-        Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio, bit, true);
-    }
-    return output;
-}
-void DigitalOutputActivate(digital_output_t output){
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->gpio, output->bit, true);
-
-}
-void DigitalOutputDesactivate(digital_output_t output){
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->gpio, output->bit, false);
-}
-void DigitalOutputToggle(digital_output_t output){
-    Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, output->gpio, output->bit);
-}
-
-digital_input_t DigitalInputCreate(uint8_t gpio, uint8_t bit, bool inverted){
+digital_input_t DigitalInputCreate(uint8_t port, uint8_t pin, bool inverted) {
     digital_input_t input = DigitalInputAllocate();
-    if (input){
-        input->gpio = gpio;
-        input->bit = bit;
+
+    if (input) {
+        input->port = port;
+        input->pin = pin;
         input->inverted = inverted;
-        Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio, bit, false);
+        Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, input->port, input->pin, false);
     }
+
     return input;
 }
 
-bool DigitalInputGetState(digital_input_t input){
-    return Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, input->gpio, input->bit);
+bool DigitalInputGetState(digital_input_t input) {
+    return input->inverted ^ Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, input->port, input->pin);
 }
 
-bool DigitalInputHasActivated(digital_input_t input){
+bool DigitalInputHasChanged(digital_input_t input) {
+    bool state = DigitalInputGetState(input);
+    bool result = state != input->last_state;
+    input->last_state = state;
+    return result;
+}
+
+bool DigitalInputHasActivated(digital_input_t input) {
     bool state = DigitalInputGetState(input);
     bool result = state && !input->last_state;
     input->last_state = state;
     return result;
 }
 
-bool DigitalInputHasDesactivated(digital_input_t input){
+bool DigitalInputHasDeactivated(digital_input_t input) {
     bool state = DigitalInputGetState(input);
     bool result = !state && !input->last_state;
     input->last_state = state;
     return result;
 }
 
-bool DigitalInputHasChanged(digital_input_t input){
-    bool state = DigitalInputGetState(input);
-    bool result = state != input->last_state;
-    input->last_state = state;
-    return result;
+digital_output_t DigitalOutputCreate(uint8_t port, uint8_t pin) {
+    digital_output_t output = DigitalOutputAllocate();
+
+    if (output) {
+        output->port = port;
+        output->pin = pin;
+        Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->port, output->pin, false);
+        Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, output->port, output->pin, true);
+    }
+
+    return output;
 }
-/* === Ciere de documentacion ============================================== */
 
-/** @} Final de la definición del modulo para doxygen */
+void DigitalOutputActivate(digital_output_t output) {
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->port, output->pin, true);
+}
 
+void DigitalOutputDeactivate(digital_output_t output) {
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, output->port, output->pin, false);
+}
+
+void DigitalOutputToggle(digital_output_t output) {
+    Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, output->port, output->pin);
+}
+
+/* === End of documentation ==================================================================== */
+
+/** @} End of module definition for doxygen */

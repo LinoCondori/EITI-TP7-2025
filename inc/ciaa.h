@@ -1,4 +1,8 @@
-/* Copyright 2022, Lino Fabian Condorì <condori.lino.f@gmail.com>
+/* Copyright 2022, Laboratorio de Microprocesadores 
+ * Facultad de Ciencias Exactas y Tecnología 
+ * Universidad Nacional de Tucuman
+ * http://www.microprocesadores.unt.edu.ar/
+ * Copyright 2022, Esteban Volentini <evolentini@herrera.unt.edu.ar>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,35 +32,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CIAA_H   /*! @cond    */
-#define CIAA_H   /*! @endcond */
+#ifndef CIAA_H
+#define CIAA_H
 
-/** @file bsp.h
+/** \brief EDU-CIAA_NXP board hardware abstraction declarations
  **
- ** @brief bsp de archivos de cabecera 
- **
- ** Plantilla para los archivos de cabeceras de las prácticos de las 
- ** asignaturas Diseño Integrado de Sistemas Emebebidos y Sistemas Embebidos
- ** de Tiempo Real dictadas en de la Especialización en Integración de
- ** Sistemas Informaticos de la Univesidad Nacional de Tucumán
- ** 
- ** | RV | YYYY.MM.DD | Autor       | Descripción de los cambios              |
- ** |----|------------|-------------|-----------------------------------------|
- ** |  1 | 2022.09.10 | lcondori    | Version inicial del archivo             |
- ** 
- ** @defgroup plantilla Plantilals de Archivos
- ** @brief Plantillas de archivos normalizadas
- ** @{ 
- */
+ ** \addtogroup hal HAL
+ ** \brief Hardware abstraction layer
+ ** @{ */
 
-/* === Inclusiones de archivos externos ==================================== */
-/* === Cabecera C++ ======================================================== */
+/* === Headers files inclusions ================================================================ */
+
+#include "chip.h"
+
+/* === Cabecera C++ ============================================================================ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* === Definicion y Macros publicos ======================================== */
-
+/* === Public macros definitions =============================================================== */
+ 
 #define LED_R_PORT 2
 #define LED_R_PIN 0
 #define LED_R_FUNC SCU_MODE_FUNC4
@@ -116,17 +112,19 @@ extern "C" {
 #define TEC_4_FUNC SCU_MODE_FUNC0
 #define TEC_4_GPIO 1
 #define TEC_4_BIT 9
-/* == Declaraciones de tipos de datos publicos ============================= */
 
-/* === Declaraciones de variables publicas ================================= */
+/* === Public data type declarations =========================================================== */
+ 
+/* === Public variable declarations ============================================================ */
 
-/* === Declaraciones de funciones publicas ================================= */
+/* === Public function declarations ============================================================ */
 
-/* === Ciere de documentacion ============================================== */
+/* === End of documentation ==================================================================== */
+
 #ifdef __cplusplus
 }
 #endif
 
-/** @} Final de la definición del modulo para doxygen */
+/** @} End of module definition for doxygen */
 
 #endif   /* CIAA_H */

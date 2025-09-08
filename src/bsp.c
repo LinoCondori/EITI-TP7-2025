@@ -1,4 +1,8 @@
-/* Copyright 2022, Lino Fabian Condorì <condori.lino.f@gmail.com>
+/* Copyright 2022, Laboratorio de Microprocesadores
+ * Facultad de Ciencias Exactas y Tecnología
+ * Universidad Nacional de Tucuman
+ * http://www.microprocesadores.unt.edu.ar/
+ * Copyright 2022, Esteban Volentini <evolentini@herrera.unt.edu.ar>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,160 +32,86 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** @file plantilla.c
+/** \brief Board hardware abstraction definitions
  **
- ** @brief Plantilla de archivos fuente
- **
- ** Plantilla para los archivos de codigo fuente de prácticos de las 
- ** asignaturas Diseño Integrado de Sistemas Emebebidos y Sistemas Embebidos
- ** de Tiempo Real dictadas en de la Especialización en Integración de
- ** Sistemas Informaticos de la Univesidad Nacional de Tucumán
- ** 
- ** | RV | YYYY.MM.DD | Autor       | Descripción de los cambios              |
- ** |----|------------|-------------|-----------------------------------------|
- ** |  1 | 2022.09.10 | lcondori    | Version inicial del archivo             |
- ** 
- ** @defgroup plantilla Plantillas de Archivos
- ** @brief Plantillas de archivos normalizadas
- ** @{ 
- */
+ ** \addtogroup hal HAL
+ ** \brief Hardware abstraction layer
+ ** @{ */
 
-/* === Inclusiones de cabeceras ============================================ */
+/* === Headers files inclusions =============================================================== */
+
 #include "bsp.h"
-#include "chip.h"
-#include "poncho.h"   
-//#include "ciaa.h"
-/* === Definicion y Macros privados ======================================== */
+#include "ciaa.h"
 
-/* === Declaraciones de tipos de datos privados ============================ */
+/* === Macros definitions ====================================================================== */
 
-/* === Definiciones de variables privadas ================================== */
+/* === Private data type declarations ========================================================== */
+
+/* === Private variable declarations =========================================================== */
+
 static struct board_s board = {0};
-/* === Definiciones de variables publicas ================================== */
 
-/* === Declaraciones de funciones privadas ================================= */
-static void DigitsInit(void);
-static void SegmentsInit(void);
+/* === Private function declarations =========================================================== */
 
-static void BuzzerInit(void);
-static void KeysInit(void);
+/* === Public variable definitions ============================================================= */
 
-void DisplayInit(void);
-void ScreenOff(void);
-void WriteNumber(uint8_t segments);
-void SelectDigit(uint8_t digit);
+/* === Private variable definitions ============================================================ */
 
-/* === Definiciones de funciones privadas ================================== */
-void DigitsInit(void){
-    Chip_SCU_PinMuxSet(DIGIT_1_PORT, DIGIT_1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | DIGIT_1_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, DIGIT_1_GPIO, DIGIT_1_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, DIGIT_1_GPIO, DIGIT_1_BIT, true);
-    
-    Chip_SCU_PinMuxSet(DIGIT_2_PORT, DIGIT_2_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | DIGIT_2_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, DIGIT_2_GPIO, DIGIT_2_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, DIGIT_2_GPIO, DIGIT_2_BIT, true);
+/* === Private function implementation ========================================================= */
 
-    Chip_SCU_PinMuxSet(DIGIT_3_PORT, DIGIT_3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | DIGIT_3_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, DIGIT_3_GPIO, DIGIT_3_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, DIGIT_3_GPIO, DIGIT_3_BIT, true);
+/* === Public function implementation ========================================================= */
 
-    Chip_SCU_PinMuxSet(DIGIT_4_PORT, DIGIT_4_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | DIGIT_4_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, DIGIT_4_GPIO, DIGIT_4_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, DIGIT_4_GPIO, DIGIT_4_BIT, true);    
-}
-void SegmentsInit(void){
-    Chip_SCU_PinMuxSet(SEGMENT_A_PORT, SEGMENT_A_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_A_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_A_GPIO, SEGMENT_A_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_A_GPIO, SEGMENT_A_BIT, true);
+board_t BoardCreate(void) {
+    Chip_SCU_PinMuxSet(LED_R_PORT, LED_R_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_R_FUNC);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_R_GPIO, LED_R_BIT, false);
+    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, LED_R_GPIO, LED_R_BIT, true);
 
-    Chip_SCU_PinMuxSet(SEGMENT_B_PORT, SEGMENT_B_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_B_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_B_GPIO, SEGMENT_B_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_B_GPIO, SEGMENT_B_BIT, true);
+    Chip_SCU_PinMuxSet(LED_G_PORT, LED_G_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_G_FUNC);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_G_GPIO, LED_G_BIT, false);
+    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, LED_G_GPIO, LED_G_BIT, true);
 
-    Chip_SCU_PinMuxSet(SEGMENT_C_PORT, SEGMENT_C_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_C_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_C_GPIO, SEGMENT_C_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_C_GPIO, SEGMENT_C_BIT, true);
+    Chip_SCU_PinMuxSet(LED_B_PORT, LED_B_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_B_FUNC);
+    board.led_azul = DigitalOutputCreate(LED_B_GPIO, LED_B_BIT);
 
-    Chip_SCU_PinMuxSet(SEGMENT_D_PORT, SEGMENT_D_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_D_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_D_GPIO, SEGMENT_D_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_D_GPIO, SEGMENT_D_BIT, true);
+    /******************/
+    Chip_SCU_PinMuxSet(LED_1_PORT, LED_1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_1_FUNC);
+    board.led_amarillo = DigitalOutputCreate(LED_1_GPIO, LED_1_BIT);
 
-    Chip_SCU_PinMuxSet(SEGMENT_E_PORT, SEGMENT_E_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_E_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_E_GPIO, SEGMENT_E_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_E_GPIO, SEGMENT_E_BIT, true);
+    Chip_SCU_PinMuxSet(LED_2_PORT, LED_2_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_2_FUNC);
+    board.led_rojo = DigitalOutputCreate(LED_2_GPIO, LED_2_BIT);
 
-    Chip_SCU_PinMuxSet(SEGMENT_F_PORT, SEGMENT_F_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_F_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_F_GPIO, SEGMENT_F_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_F_GPIO, SEGMENT_F_BIT, true);
+    Chip_SCU_PinMuxSet(LED_3_PORT, LED_3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_3_FUNC);
+    board.led_verde = DigitalOutputCreate(LED_3_GPIO, LED_3_BIT);
 
-    Chip_SCU_PinMuxSet(SEGMENT_G_PORT, SEGMENT_G_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_G_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_G_GPIO, SEGMENT_G_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_G_GPIO, SEGMENT_G_BIT, true);
+    /******************/
+    Chip_SCU_PinMuxSet(TEC_1_PORT, TEC_1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | TEC_1_FUNC);
+    board.boton_prueba = DigitalInputCreate(TEC_1_GPIO, TEC_1_BIT, true);
 
-        Chip_SCU_PinMuxSet(SEGMENT_P_PORT, SEGMENT_P_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_P_FUNC);
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, true);
-}
+    Chip_SCU_PinMuxSet(TEC_2_PORT, TEC_2_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | TEC_2_FUNC);
+    board.boton_cambiar = DigitalInputCreate(TEC_2_GPIO, TEC_2_BIT, true);
 
+    Chip_SCU_PinMuxSet(TEC_3_PORT, TEC_3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | TEC_3_FUNC);
+    board.boton_prender = DigitalInputCreate(TEC_3_GPIO, TEC_3_BIT, true);
 
-void BuzzerInit(void){
-    Chip_SCU_PinMuxSet(BUZZER_PORT, BUZZER_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | BUZZER_FUNC);
-    board.buzzer = DigitalOutputCreate(BUZZER_GPIO, BUZZER_BIT);
-}
+    Chip_SCU_PinMuxSet(TEC_4_PORT, TEC_4_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | TEC_4_FUNC);
+    board.boton_apagar = DigitalInputCreate(TEC_4_GPIO, TEC_4_BIT, true);
 
-void KeysInit(void){
-    Chip_SCU_PinMuxSet(KEY_ACCEPT_PORT, KEY_ACCEPT_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_ACCEPT_FUNC);
-    Chip_SCU_PinMuxSet(KEY_CANCEL_PORT, KEY_CANCEL_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_CANCEL_FUNC);
-    Chip_SCU_PinMuxSet(KEY_F1_PORT, KEY_F1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F1_FUNC);
-    Chip_SCU_PinMuxSet(KEY_F2_PORT, KEY_F2_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F2_FUNC);
-    Chip_SCU_PinMuxSet(KEY_F3_PORT, KEY_F3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F3_FUNC);
-    Chip_SCU_PinMuxSet(KEY_F4_PORT, KEY_F4_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F4_FUNC);
-
- 
-    board.accept =    DigitalInputCreate(KEY_ACCEPT_GPIO, KEY_ACCEPT_BIT, true);
-    board.cancel =    DigitalInputCreate(KEY_CANCEL_GPIO, KEY_CANCEL_BIT, true);
-    board.set_time =  DigitalInputCreate(KEY_F1_GPIO, KEY_F1_BIT, true);
-    board.set_alarm = DigitalInputCreate(KEY_F2_GPIO, KEY_F2_BIT, true);
-    board.decrement = DigitalInputCreate(KEY_F3_GPIO, KEY_F3_BIT, true);
-    board.increment = DigitalInputCreate(KEY_F4_GPIO, KEY_F4_BIT, true);
-}
-
-void DisplayInit(void){
-    static const struct display_driver_s display_driver = {
-        .ScreenTurnOff = ScreenOff,
-        .SegmentsTurnOn = WriteNumber,
-        .DigitTurnOn = SelectDigit,
-    };
-    board.display = DisplayCreate(4, &display_driver);
-
-}
-
-
-void ScreenOff(void){
-    Chip_GPIO_ClearValue(LPC_GPIO_PORT, DIGITS_GPIO, DIGITS_MASK);
-    Chip_GPIO_ClearValue(LPC_GPIO_PORT, SEGMENTS_GPIO, SEGMENTS_MASK);
-
-}
-
-void WriteNumber(uint8_t segments){
-    Chip_GPIO_SetValue(LPC_GPIO_PORT, SEGMENTS_GPIO, segments);
-}
-void SelectDigit(uint8_t digit){
-    Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO,(1 << digit));
-
-}
-
-board_t BoardCreate(void){
-    DigitsInit();
-    SegmentsInit();
-    BuzzerInit();
-    KeysInit();
-    DisplayInit();
     return &board;
 }
-/* === Definiciones de funciones publicas ================================== */
 
-/* === Ciere de documentacion ============================================== */
+void SisTick_Init(uint16_t ticks) {
+    __asm volatile("cpsid i");
 
-/** @} Final de la definición del modulo para doxygen */
+    /* Activate SysTick */
+    SystemCoreClockUpdate();
+    SysTick_Config(SystemCoreClock / ticks);
 
+    /* Update priority set by SysTick_Config */
+    NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+
+    __asm volatile("cpsie i");
+}
+
+/* === End of documentation ==================================================================== */
+
+/** @} End of module definition for doxygen */

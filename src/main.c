@@ -64,12 +64,9 @@
 
 int main(void) {
 
-    uint8_t numero[4] = {1, 2, 3, 4};
-    board_t board = BoardCreate();
 
-    DisplayWriteBCD(board->display, numero, sizeof(numero));
     while (true) {
-        DisplayRefresh(board->display);
+        
 
         for (int delay = 0; delay < 25000; delay++) {
             __asm("NOP");

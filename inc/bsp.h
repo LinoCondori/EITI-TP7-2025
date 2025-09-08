@@ -1,4 +1,9 @@
-/* Copyright 2022, Lino Fabian Condorì <condori.lino.f@gmail.com>
+/* Copyright 2022, Laboratorio de Microprocesadores 
+ * Facultad de Ciencias Exactas y Tecnología 
+ * Universidad Nacional de Tucuman
+ * http://www.microprocesadores.unt.edu.ar/
+ * Copyright 2022, Esteban Volentini <evolentini@herrera.unt.edu.ar>
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,64 +32,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef BSP_H   /*! @cond    */
-#define BSP_H   /*! @endcond */
+#ifndef BSP_H
+#define BSP_H
 
-/** @file bsp.h
+/** \brief Board hardware abstraction declarations
  **
- ** @brief bsp de archivos de cabecera 
- **
- ** Plantilla para los archivos de cabeceras de las prácticos de las 
- ** asignaturas Diseño Integrado de Sistemas Emebebidos y Sistemas Embebidos
- ** de Tiempo Real dictadas en de la Especialización en Integración de
- ** Sistemas Informaticos de la Univesidad Nacional de Tucumán
- ** 
- ** | RV | YYYY.MM.DD | Autor       | Descripción de los cambios              |
- ** |----|------------|-------------|-----------------------------------------|
- ** |  1 | 2022.09.10 | lcondori    | Version inicial del archivo             |
- ** 
- ** @defgroup plantilla Plantilals de Archivos
- ** @brief Plantillas de archivos normalizadas
- ** @{ 
- */
+ ** \addtogroup hal HAL
+ ** \brief Hardware abstraction layer
+ ** @{ */
 
-/* === Inclusiones de archivos externos ==================================== */
+/* === Headers files inclusions ================================================================ */
+
 #include "digital.h"
-#include "pantalla.h"
+#include <stdint.h>
 
-/* === Cabecera C++ ======================================================== */
+/* === Cabecera C++ ============================================================================ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* === Definicion y Macros publicos ======================================== */
+/* === Public macros definitions =============================================================== */
 
-/* == Declaraciones de tipos de datos publicos ============================= */
-typedef struct board_s{    
-    digital_output_t buzzer;
+/* === Public data type declarations =========================================================== */
+ 
+typedef struct board_s {
+    digital_output_t led_azul;
+    digital_output_t led_rojo;
+    digital_output_t led_amarillo;
+    digital_output_t led_verde;
 
-    digital_input_t set_time;
-    digital_input_t set_alarm;
-    digital_input_t decrement;
-    digital_input_t increment;
-    digital_input_t accept;
-    digital_input_t cancel;
+    digital_input_t boton_prueba;
+    digital_input_t boton_cambiar;
+    digital_input_t boton_prender;
+    digital_input_t boton_apagar;
+} const * board_t;
 
-    display_t display;
-    
-}const * board_t;
+/* === Public variable declarations ============================================================ */
 
+/* === Public function declarations ============================================================ */
 
-
-/* === Declaraciones de variables publicas ================================= */
-
-/* === Declaraciones de funciones publicas ================================= */
 board_t BoardCreate(void);
-/* === Ciere de documentacion ============================================== */
+
+void SisTick_Init(uint16_t ticks);
+
+/* === End of documentation ==================================================================== */
+
 #ifdef __cplusplus
 }
 #endif
 
-/** @} Final de la definición del modulo para doxygen */
+/** @} End of module definition for doxygen */
 
 #endif   /* BSP_H */

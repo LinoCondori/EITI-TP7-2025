@@ -1,4 +1,8 @@
-/* Copyright 2022, Lino Fabian Condorì <condori.lino.f@gmail.com>
+/* Copyright 2022, Laboratorio de Microprocesadores
+ * Facultad de Ciencias Exactas y Tecnología
+ * Universidad Nacional de Tucuman
+ * http://www.microprocesadores.unt.edu.ar/
+ * Copyright 2022, Esteban Volentini <evolentini@herrera.unt.edu.ar>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,61 +32,123 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLANTILLA_H   /*! @cond    */
-#define PLANTILLA_H   /*! @endcond */
+#ifndef DIGITAL_H
+#define DIGITAL_H
 
-/** @file plantilla.h
+/** \brief Digital inputs/outputs declarations
  **
- ** @brief Plantilla de archivos de cabecera 
- **
- ** Plantilla para los archivos de cabeceras de las prácticos de las 
- ** asignaturas Diseño Integrado de Sistemas Emebebidos y Sistemas Embebidos
- ** de Tiempo Real dictadas en de la Especialización en Integración de
- ** Sistemas Informaticos de la Univesidad Nacional de Tucumán
- ** 
- ** | RV | YYYY.MM.DD | Autor       | Descripción de los cambios              |
- ** |----|------------|-------------|-----------------------------------------|
- ** |  1 | 2022.09.10 | lcondori    | Version inicial del archivo             |
- ** 
- ** @defgroup plantilla Plantilals de Archivos
- ** @brief Plantillas de archivos normalizadas
- ** @{ 
- */
+ ** \addtogroup hal HAL
+ ** \brief Hardware abstraction layer
+ ** @{ */
 
-/* === Inclusiones de archivos externos ==================================== */
+/* === Headers files inclusions ================================================================ */
 
-/* === Cabecera C++ ======================================================== */
+#include <stdbool.h>
+#include <stdint.h>
+
+/* === Cabecera C++ ============================================================================ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* === Definicion y Macros publicos ======================================== */
-#include <stdint.h>
-#include <stdbool.h>
-/* == Declaraciones de tipos de datos publicos ============================= */
-typedef struct digital_output_s * digital_output_t;
+/* === Public macros definitions =============================================================== */
 
+//! Referencia a un descriptor para gestionar una entrada digital
 typedef struct digital_input_s * digital_input_t;
 
-/* === Declaraciones de variables publicas ================================= */
+//! Referencia a un descriptor para gestionar una salida digital
+typedef struct digital_output_s * digital_output_t;
 
-/* === Declaraciones de funciones publicas ================================= */
-digital_output_t DigitalOutputCreate(uint8_t gpio, uint8_t bit);
+/* === Public data type declarations =========================================================== */
+
+/* === Public variable declarations ============================================================ */
+
+/* === Public function declarations ============================================================ */
+
+/**
+ * @brief Metodo para crear una entrada digital
+ * 
+ * @param   port        Puerto GPIO que contine a la salida
+ * @param   pin         Numero de terminal del puerto GPIO asignado a la salida
+ * @param   inverted    Badera que indica que la entrada trabaja con logica invertida
+ * @return  digital_output_t    Puntero al descriptor de la salida creada
+ */
+digital_input_t DigitalInputCreate(uint8_t port, uint8_t pin, bool inverted);
+
+/**
+ * @brief Metodo para consultar el estado de una entrada digital
+ * 
+ * @param   input   Puntero al descriptor de la entrada
+ * @return  true    La entrada esta activa
+ * @return  false   La entrada esta inactiva
+ */
+bool DigitalInputGetState(digital_input_t input);
+
+/**
+ * @brief Metodo para consultar cambios en el estado de una entrada digital
+ * 
+ * @param   input   Puntero al descriptor de la entrada
+ * @return  true    La entrada tuvo cambios desde la ultima llamada
+ * @return  false   La entrada no tuvo cambios desde la ultima llamada
+ */
+bool DigitalInputHasChanged(digital_input_t input);
+
+/**
+ * @brief Metodo para consultar activaciones en una entrada digital
+ * 
+ * @param   input   Puntero al descriptor de la entrada
+ * @return  true    La entrada tuvo activaciones desde la ultima llamada
+ * @return  false   La entrada no tuvo activaciones desde la ultima llamada
+ */
+bool DigitalInputHasActivated(digital_input_t input);
+
+/**
+ * @brief Metodo para consultar descativaciones en una entrada digital
+ * 
+ * @param   input   Puntero al descriptor de la entrada
+ * @return  true    La entrada tuvo descativaciones desde la ultima llamada
+ * @return  false   La entrada no tuvo descativaciones desde la ultima llamada
+ */
+bool DigitalInputHasDeactivated(digital_input_t input);
+
+/**
+ * @brief Metodo para crear una salida digital
+ * 
+ * @param   port    Puerto GPIO que contine a la salida
+ * @param   pin     Numero de terminal del puerto GPIO asignado a la salida
+ * @return  digital_output_t    Puntero al descriptor de la salida creada
+ */
+digital_output_t DigitalOutputCreate(uint8_t port, uint8_t pin);
+
+/**
+ * @brief Metodo para prender una salida digital
+ * 
+ * @param   output  Puntero al descriptor de la salida 
+ */
 void DigitalOutputActivate(digital_output_t output);
-void DigitalOutputDesactivate(digital_output_t output);
+
+/**
+ * @brief Metodo para apagar una salida digital
+ * 
+ * @param   output  Puntero al descriptor de la salida
+ */
+void DigitalOutputDeactivate(digital_output_t output);
+
+/**
+ * @brief Metodo para invertir el estado de una salida digital
+ * 
+ * @param   output  Puntero al descriptor de la salida 
+ */
 void DigitalOutputToggle(digital_output_t output);
 
-digital_input_t DigitalInputCreate(uint8_t gpio, uint8_t bit, bool interted);
-bool DigitalInputGetState(digital_input_t input);
-bool DigitalInputHasChanged(digital_input_t input);
-bool DigitalInputHasActivated(digital_input_t input);
-bool DigitalInputHasDesactivated(digital_input_t input);
 
-/* === Ciere de documentacion ============================================== */
+/* === End of documentation ==================================================================== */
+
 #ifdef __cplusplus
 }
 #endif
 
-/** @} Final de la definición del modulo para doxygen */
+/** @} End of module definition for doxygen */
 
-#endif   /* PLANTILLA_H */
+#endif /* DIGITAL_H */
